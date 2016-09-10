@@ -81,9 +81,9 @@ struct VectorTester<T: VectorType> {
     static func testInterpolatable() {
         let v1 = T(scalar: 0.0)
         let v2 = T(scalar: 10.0)
-        XCTAssert(v1.interpolatedTo(v2, alpha: 0.0) == v1)
-        XCTAssert(v1.interpolatedTo(v2, alpha: 0.55) == T(scalar: 5.5))
-        XCTAssert(v1.interpolatedTo(v2, alpha: 1.0) == v2)
+        XCTAssert(v1.interpolated(to: v2, alpha: 0.0) == v1)
+        XCTAssert(v1.interpolated(to: v2, alpha: 0.55) == T(scalar: 5.5))
+        XCTAssert(v1.interpolated(to: v2, alpha: 1.0) == v2)
     }
     
     static func testMath() {
@@ -99,7 +99,7 @@ struct VectorTester<T: VectorType> {
         
         XCTAssert(Scalar(2.0) * v2 == T(scalar: 2.0 * s2))
         
-        func testInPlaceMath(function: (inout T, T) -> Void, expectedValue: T) {
+        func testInPlaceMath(_ function: (inout T, T) -> Void, expectedValue: T) {
             var m = v1
             function(&m, v2)
             XCTAssert(m == expectedValue)

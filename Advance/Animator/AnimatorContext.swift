@@ -47,14 +47,14 @@ public final class AnimatorContext {
     ///
     /// - parameter animation: The animation to run.
     /// - returns: The newly generated `Animator` instance.
-    public func animate<A: AnimationType>(animation: A) -> Animator<A> {
+    public func animate<A: AnimationType>(_ animation: A) -> Animator<A> {
         let a = Animator(animation: animation)
         a.start()
-        if a.state == .Running {
+        if a.state == .running {
             let wrapper = AnimatorWrapper(animator: a)
             animators.insert(wrapper)
             let obs: (A)->Void = { [weak self] (a) -> Void in
-                self?.animators.remove(wrapper)
+                _ = self?.animators.remove(wrapper)
             }
             a.cancelled.observe(obs)
             a.finished.observe(obs)
@@ -76,7 +76,7 @@ private struct AnimatorWrapper: Hashable {
     }
     
     var hashValue: Int {
-        return unsafeAddressOf(animator).hashValue
+        return ObjectIdentifier(animator).hashValue
     }
 }
 

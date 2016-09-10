@@ -50,7 +50,7 @@ public struct BasicAnimation<Value: VectorConvertible>: ValueAnimationType {
     /// - parameter to: The value at the end of the animation.
     /// - parameter duration: How long (in seconds) the animation should last.
     /// - parameter timingFunction: The timing function to use.
-    public init(from: Value, to: Value, duration: Double, timingFunction: TimingFunctionType = UnitBezier(preset: .SwiftOut)) {
+    public init(from: Value, to: Value, duration: Double, timingFunction: TimingFunctionType = UnitBezier(preset: .swiftOut)) {
         self.from = from
         self.to = to
         self.duration = duration
@@ -75,7 +75,7 @@ public struct BasicAnimation<Value: VectorConvertible>: ValueAnimationType {
     /// Advances the animation.
     ///
     /// - parameter elapsed: The time (in seconds) to advance the animation.
-    public mutating func advance(time: Double) {
+    public mutating func advance(_ time: Double) {
         let starting = value
         
         elapsed += time
@@ -84,7 +84,7 @@ public struct BasicAnimation<Value: VectorConvertible>: ValueAnimationType {
         progress = min(progress, 1.0)
         let adjustedProgress = timingFunction.solveForTime(Scalar(progress), epsilon: 1.0 / Scalar(duration * 1000.0))
         
-        let val = from.vector.interpolatedTo(to.vector, alpha: Scalar(adjustedProgress))
+        let val = from.vector.interpolated(to: to.vector, alpha: Scalar(adjustedProgress))
         value = Value(vector: val)
 
         let vel = Scalar(1.0/time) * (value.vector - starting.vector)
@@ -102,8 +102,8 @@ public extension Animatable {
     /// - parameter to: The value to animate to.
     /// - parameter completion: An optional closure that will be called when
     ///   the animation completes.
-    public func animateTo(to: Value, completion: Completion? = nil) {
-        animateTo(to, duration: 0.25, timingFunction: UnitBezier(preset: .SwiftOut), completion: completion)
+    public func animate(to: Value, completion: Completion? = nil) {
+        animate(to: to, duration: 0.25, timingFunction: UnitBezier(preset: .swiftOut), completion: completion)
     }
     
     /// Animates to the specified value.
@@ -113,7 +113,7 @@ public extension Animatable {
     /// - parameter timingFunction: The timing (easing) function to use.
     /// - parameter completion: An optional closure that will be called when
     ///   the animation completes.
-    public func animateTo(to: Value, duration: Double, timingFunction: TimingFunctionType, completion: Completion? = nil) {
+    public func animate(to: Value, duration: Double, timingFunction: TimingFunctionType, completion: Completion? = nil) {
         let a = BasicAnimation(from: value, to: to, duration: duration, timingFunction: timingFunction)
         animate(a, completion: completion)
     }
@@ -130,7 +130,7 @@ public extension VectorConvertible {
     /// - parameter callback: A closure that will be called with the new value
     ///   for each frame of the animation until it is finished.
     /// - returns: The underlying animator.
-    public func animateTo(to: Self, duration: Double, timingFunction: TimingFunctionType, callback: (Self)->Void) -> Animator<BasicAnimation<Self>> {
+    public func animate(to: Self, duration: Double, timingFunction: TimingFunctionType, callback: @escaping (Self)->Void) -> Animator<BasicAnimation<Self>> {
         let a = BasicAnimation(from: self, to: to, duration: duration, timingFunction: timingFunction)
         let animator = AnimatorContext.shared.animate(a)
         animator.changed.observe { (a) in
